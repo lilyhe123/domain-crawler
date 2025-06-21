@@ -1,5 +1,5 @@
 <p align="left">
-	<a href="https://github.com/lilyhe123/web-crawler/actions/workflows/maven.yml"><img alt="Actions status" src="https://github.com/lilyhe123/web-crawler/actions/workflows/maven.yml/badge.svg"</a>
+	<a href="https://github.com/lilyhe123/domain-crawler/actions/workflows/maven.yml"><img alt="Actions status" src="https://github.com/lilyhe123/domain-crawler/actions/workflows/maven.yml/badge.svg"</a>
 </p>
 		
 ## Requirements
