@@ -8,18 +8,19 @@ import com.web.api.IHtmlConsumer;
 import com.web.api.IHtmlDownloader;
 import com.web.api.ILinkExtractor;
 import com.web.api.IURLFrontier;
-import com.web.threadpool.HtmlConsumer;
-import com.web.threadpool.HtmlDownloader;
-import com.web.threadpool.LinkExtractor;
+import com.web.impl.HtmlConsumer;
+import com.web.impl.HtmlDownloader;
+import com.web.impl.LinkExtractor;
+import com.web.impl.URLFrontier;
 
 public class WebCrawler {
     private final IURLFrontier frontier;
     private final List<IExecutor> executorList = new ArrayList<>();
 
-    public WebCrawler(String startUrl) {
+    public WebCrawler(String startUrl, boolean useVirtualThread) {
         ILinkExtractor extractor = new LinkExtractor();
         IHtmlConsumer consumer = new HtmlConsumer();
-        IHtmlDownloader downloader = new HtmlDownloader(extractor, consumer);
+        IHtmlDownloader downloader = new HtmlDownloader(extractor, consumer, useVirtualThread);
         frontier = new URLFrontier(startUrl, downloader);
         extractor.setFrontier(frontier);
         executorList.add(frontier);
@@ -44,11 +45,25 @@ public class WebCrawler {
         System.out.println(sb);
     }
     public static void main(String... args) throws Exception {
-        if (args.length != 1) {
-            System.out.println("Pls provide a startUrl.");
-            System.out.println(1);
+        String startUrl = null;
+        boolean useVirtualThread = false;
+        switch (args.length) {
+            case 1 -> startUrl = args[0];
+            case 2 -> {
+                startUrl = args[0];
+                if (args[1].equals("-useVirtualThread")) {
+                    useVirtualThread = true;
+                } else {
+                    usage();
+                }
+            }
+            default -> usage();
         }
-        WebCrawler crawler = new WebCrawler(args[0]);
+        WebCrawler crawler = new WebCrawler(startUrl, useVirtualThread);
         crawler.run();
+    }
+    public static void usage() {
+        System.out.println("WebCrawler <startUrl> [-useVirtualThread]");
+            System.out.println(1);
     }
 }

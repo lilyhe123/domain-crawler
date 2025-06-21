@@ -26,7 +26,7 @@ Repeat the process until all pages in the same domain have been crawled.
 
 ### Running the Application
 ```bash
-mvn exec:java -Dexec.mainClass="com.web.WebCrawler" -Dexec.args="https://bravenewgeek.com/" 
+mvn exec:java -Dexec.mainClass="com.web.WebCrawler" -Dexec.args="https://bbc.com/" 
 
 ```
 
@@ -36,18 +36,3 @@ mvn exec:java -Dexec.mainClass="com.web.WebCrawler" -Dexec.args="https://bravene
 - use vthread in downloader, compare results with using thread pool
 - add rate Limiter
 
-
-```bash
-mvn exec:java -Dexec.mainClass="com.web.WebCrawler" -Dexec.args="https://bravenewgeek.com/" 2>&1 | tee 11.out
-
-
-sample domains: "https://bravenewgeek.com", "https://lilyhe123.github.io/", "https://www.bbc.com/";
-
-Errors:
-Got IOException. Connection reset. url: https://lilyhe123.github.io
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.NioSocketImpl.implRead(NioSocketImpl.java:318)
-	at java.base/sun.nio.ch.NioSocketImpl.read(NioSocketImpl.java:345)
-	at java.base/sun.nio.ch.NioSocketImpl$1.read(NioSocketImpl.java:794)
-	at java.base/java.net.Socket$SocketInputStream.read(Socket.java:1025)
-```

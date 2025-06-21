@@ -1,10 +1,15 @@
-package com.web.threadpool;
+package com.web.impl;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import org.jsoup.select.Elements;
 
 import com.web.api.IHtmlConsumer;
 import com.web.data.HtmlPage;
-import org.jsoup.select.Elements;
-
-import java.util.concurrent.*;
 
 public class HtmlConsumer implements IHtmlConsumer {
   private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(Consts.QUEUE_CAPACITY);

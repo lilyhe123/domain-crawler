@@ -1,10 +1,11 @@
-package com.web.threadpool;
+package com.web.impl;
 
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -19,13 +20,14 @@ import com.web.api.IHtmlConsumer;
 import com.web.api.IHtmlDownloader;
 import com.web.api.ILinkExtractor;
 import com.web.data.HtmlPage;
+import com.web.executor.TaskExecutor;
+import com.web.executor.ThreadPoolTaskExecutor;
+import com.web.executor.VirtualThreadTaskExecutor;
 
 public class HtmlDownloader implements IHtmlDownloader {
 
-  private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-  private final ExecutorService executor = new ThreadPoolExecutor(Consts.DOWNLOAD_POOL_SIZE, Consts.DOWNLOAD_POOL_SIZE,
-          0, TimeUnit.SECONDS, queue);
-
+  private final TaskExecutor executor;
+      
   private final Connection session = Jsoup.newSession().timeout(Consts.HTTP_GET_TIMEOUT);
   private final ILinkExtractor linkExtractor;
   private final IHtmlConsumer htmlConsumer;
@@ -35,9 +37,14 @@ public class HtmlDownloader implements IHtmlDownloader {
   private final AtomicLong failedPages = new AtomicLong();
   private final AtomicLong retryFailedPages = new AtomicLong();
 
-  public HtmlDownloader(ILinkExtractor ex, IHtmlConsumer consumer) {
+  public HtmlDownloader(ILinkExtractor ex, IHtmlConsumer consumer, boolean useVirtualThread) {
     linkExtractor = ex;
     htmlConsumer = consumer;
+    if (useVirtualThread) {
+      executor = new VirtualThreadTaskExecutor(Consts.DOWLOAD_VT_PERMITS);
+    } else {
+      executor = new ThreadPoolTaskExecutor(Consts.DOWNLOAD_POOL_SIZE);
+    }
   }
   @Override
   public void shutdown() {
@@ -50,12 +57,7 @@ public class HtmlDownloader implements IHtmlDownloader {
 
   @Override
   public void add(HtmlPage page, CountDownLatch latch) {
-    executor.submit(()-> {
-      crawl(page, latch);
-      try {
-        Thread.sleep(Consts.DOWNLOAD_DELAY);
-      } catch(InterruptedException e) {}
-    });
+    executor.submit(this::crawl, page, latch);
   }
   // refer to https://jsoup.org/apidocs/org/jsoup/Connection.html#get() about different exceptions
   private void crawl(HtmlPage page, CountDownLatch latch) {
@@ -105,6 +107,8 @@ public class HtmlDownloader implements IHtmlDownloader {
         System.err.println("Failed to download a page. url: " + url);
         failedPages.incrementAndGet();
       }
+      // since download the page failed, no page to extract and consume, 
+      // count down latch to mark the page as completed.
       latch.countDown();
       latch.countDown();
     } else {

@@ -1,4 +1,4 @@
-package com.web;
+package com.web.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.web.Util;
 import com.web.api.IHtmlDownloader;
 import com.web.api.IURLFrontier;
 import com.web.data.HtmlPage;
@@ -29,9 +30,9 @@ import com.web.file.StringListFile;
  * 
  * Persist to files:
  * - all urls that have been seen, persist in the same order as been seen.
- *   Always append to the file.
+ *   Always append new url to the file. Use BufferedWriter for better performance.
  * - finishedCount.
- *   Store only one integer. Always rewrite as a whole.
+ *   Store only one integer. Update as a whole. Use FileWriter.
  * 
  * If the crawler crashed in the middle, in next run it can resume from what left last time.
  * Because urls are scheduled and completed in the same order as persited, based on finishedCount it can quickly
