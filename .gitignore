@@ -1,0 +1,6 @@
+*.out
+.idea
+.mvn
+target/
+data/
+old-data/
