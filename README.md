@@ -33,6 +33,5 @@ mvn exec:java -Dexec.mainClass="com.web.WebCrawler" -Dexec.args="https://bbc.com
 ## TODO
 - add logger
 - more status
-- use vthread in downloader, compare results with using thread pool
 - add rate Limiter
 
