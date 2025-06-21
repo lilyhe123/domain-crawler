@@ -29,10 +29,14 @@ import com.web.file.StringListFile;
  * 
  * Persist to files:
  * - all urls that have been seen, persist in the same order as been seen.
+ *   Always append to the file.
  * - finishedCount.
+ *   Store only one integer. Always rewrite as a whole.
+ * 
  * If the crawler crashed in the middle, in next run it can resume from what left last time.
- * Because urls are scheduled in the same order as persited, based on finishedCount we can quickly
+ * Because urls are scheduled and completed in the same order as persited, based on finishedCount it can quickly
  * allocate the first url that needs to crawl from.
+ * 
  */
 public class URLFrontier implements IURLFrontier {
   private final String baseDomain;
