@@ -10,7 +10,6 @@ public class Consts {
   // constants of thread pool and task queue
   public static final int QUEUE_CAPACITY = 500;
   public static final int DOWNLOAD_POOL_SIZE = 10;
-  public static final int DOWLOAD_VT_PERMITS = 10;
   public static final int PARSER_POOL_SIZE = 2;
   public static final int CONSUMER_POOL_SIZE = 1;
 }

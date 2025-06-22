@@ -20,6 +20,7 @@ import com.web.api.IHtmlConsumer;
 import com.web.api.IHtmlDownloader;
 import com.web.api.ILinkExtractor;
 import com.web.data.HtmlPage;
+import com.web.executor.ExecutorFactory;
 import com.web.executor.TaskExecutor;
 import com.web.executor.ThreadPoolTaskExecutor;
 import com.web.executor.VirtualThreadTaskExecutor;
@@ -40,11 +41,7 @@ public class HtmlDownloader implements IHtmlDownloader {
   public HtmlDownloader(ILinkExtractor ex, IHtmlConsumer consumer, boolean useVirtualThread) {
     linkExtractor = ex;
     htmlConsumer = consumer;
-    if (useVirtualThread) {
-      executor = new VirtualThreadTaskExecutor(Consts.DOWLOAD_VT_PERMITS);
-    } else {
-      executor = new ThreadPoolTaskExecutor(Consts.DOWNLOAD_POOL_SIZE);
-    }
+    executor = ExecutorFactory.createExecutor(Consts.DOWNLOAD_POOL_SIZE, useVirtualThread);
   }
   @Override
   public void shutdown() {
