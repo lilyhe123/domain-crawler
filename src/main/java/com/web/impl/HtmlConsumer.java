@@ -2,7 +2,6 @@ package com.web.impl;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -15,19 +14,22 @@ public class HtmlConsumer implements IHtmlConsumer {
   private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(Consts.QUEUE_CAPACITY);
   private final ThreadPoolExecutor executor = new ThreadPoolExecutor(Consts.CONSUMER_POOL_SIZE, Consts.CONSUMER_POOL_SIZE,
           0, TimeUnit.SECONDS, queue);
-
+ 
   public void shutdown() {
     executor.shutdown();
   }
   public String status() {
-    return executor.toString();
+    StringBuilder sb = new StringBuilder();
+    sb.append("HtmlConsumer status: \n");
+    sb.append(executor.toString());
+    return sb.toString();
   }
 
-  public void add(HtmlPage page, CountDownLatch latch){
-    executor.submit(() -> consume(page, latch));
+  public void add(HtmlPage page){
+    executor.submit(() -> consume(page));
   }
 
-  private void consume(HtmlPage page, CountDownLatch latch) {
+  private void consume(HtmlPage page) {
     try {
       String url = page.getUrl();
       Elements links = page.getDoc().select("a[href]");
@@ -40,7 +42,7 @@ public class HtmlConsumer implements IHtmlConsumer {
     } catch (Throwable t) {
       t.printStackTrace();
     } finally {
-      latch.countDown();
+      page.countDown();
     }
   }
 }

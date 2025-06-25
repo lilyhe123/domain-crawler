@@ -8,6 +8,9 @@ import com.web.api.IHtmlConsumer;
 import com.web.api.IHtmlDownloader;
 import com.web.api.ILinkExtractor;
 import com.web.api.IURLFrontier;
+import com.web.executor.ExecutorFactory;
+import com.web.executor.TaskExecutor;
+import com.web.impl.Consts;
 import com.web.impl.HtmlConsumer;
 import com.web.impl.HtmlDownloader;
 import com.web.impl.LinkExtractor;
@@ -20,7 +23,8 @@ public class WebCrawler {
     public WebCrawler(String startUrl, boolean useVirtualThread) {
         ILinkExtractor extractor = new LinkExtractor();
         IHtmlConsumer consumer = new HtmlConsumer();
-        IHtmlDownloader downloader = new HtmlDownloader(extractor, consumer, useVirtualThread);
+        TaskExecutor taskExe = ExecutorFactory.createExecutor(Consts.DOWNLOAD_POOL_SIZE, useVirtualThread);
+        IHtmlDownloader downloader = new HtmlDownloader(extractor, consumer, taskExe);
         frontier = new URLFrontier(startUrl, downloader);
         extractor.setFrontier(frontier);
         executorList.add(frontier);
@@ -30,7 +34,7 @@ public class WebCrawler {
     }
     public void run() throws Exception {
         frontier.start();
-        while(!frontier.hasError() && !frontier.isCompleted()) {
+        while(!frontier.hasFatalError() && !frontier.isCompleted()) {
             printStatus();
             try {
                 Thread.sleep(5000);

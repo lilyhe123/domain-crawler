@@ -1,8 +1,8 @@
 package com.web.executor;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public interface TaskExecutor {
-  <T,U> void submit(BiConsumer<T,U> consumer, T t, U u);
+  <T,U> void submit(Consumer<T> consumer, T t);
   void shutdown();
 }

@@ -7,7 +7,7 @@ Write a singe-domain crawler. Given a starting URL, the crawler should visit eac
 
 The crawler should be limited to one domain - so when you start with *https://www.bbc.com/*, it would crawl all pages on the bbc.com website, but not follow external links, for example to twitter.com or nytimes.com etc.
 
-## Design
+## High-level Design
 Starting from the given URL, the crawler downloads the page and extracts all links in that page. Follow the new local links the crawler can download more pages.
 Repeat the process until all pages in the same domain have been crawled.
 

@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class VirtualThreadTaskExecutor implements TaskExecutor {
   private final Semaphore semaphore;
@@ -17,12 +17,12 @@ public class VirtualThreadTaskExecutor implements TaskExecutor {
   }
 
   @Override
-  public <T, U> void submit(BiConsumer<T, U> consumer, T t, U u) {
+  public <T, U> void submit(Consumer<T> consumer, T t) {
     executor.submit(() -> {
       try {
         semaphore.acquire();
         try {
-          consumer.accept(t, u);
+          consumer.accept(t);
         } finally {
           semaphore.release();
         }

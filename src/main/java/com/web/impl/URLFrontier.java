@@ -3,7 +3,6 @@ package com.web.impl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -76,19 +75,24 @@ public class URLFrontier implements IURLFrontier {
   @Override
   public void start() throws IOException {
     // init data directory and files
-    Path dataDir = Paths.get("data");  // relative to project root
+    Path dataDir = Path.of("data");  // relative to project root
     Files.createDirectories(dataDir);  // create if not exists
+    boolean newRun = true;
+    if (Files.exists(Path.of("data", urlFileName))) {
+      newRun = false;
+    }
     urlFile = new StringListFile(dataDir.resolve(urlFileName));
     counterFile = new CounterFile(dataDir.resolve(counterFileName));
-    finishedCount = counterFile.get();
     
-    if(finishedCount == 0) {// initial run
+    if(newRun) {
       List<String> list = new ArrayList<>();
       list.add(startUrl);
       add(list);
       System.out.println("Fresh rerun. ");
-    } else {// resume run
+    } else {
+      // resume last run
       List<String> list = urlFile.readAll();
+      finishedCount = counterFile.get();
       if(finishedCount == list.size()) {
         throw new IllegalStateException("Last run with domain " 
         + baseDomain + " has already finished. If you want to rerun, remove status files and rerun.");
@@ -104,29 +108,31 @@ public class URLFrontier implements IURLFrontier {
   @Override
   public void shutdown() {
     executor.shutdown();
-    urlFile.close();
   }
   @Override
   public boolean isCompleted() {
     return completed;
   }
   @Override
-  public boolean hasError() {
+  public boolean hasFatalError() {
     return hasError;
   }
   @Override
   public String status() {
     StringBuilder sb = new StringBuilder();
-
+    sb.append("URLFrontier status: \n");
+    sb.append("size of urlSet: ").append(urlSet.size()).append("\n");
+    sb.append("size of urlQueue: ").append(urlQueue.size()).append("\n");
+    sb.append("finishedCount: ").append(finishedCount).append("\n");
     return sb.toString();
   }
-  @Override
-  public boolean add(String url, boolean fromFile) {
-    if(fromFile || (Util.isSameDomain(url, baseDomain)  && urlSet.add(url))) {
+
+  private boolean add(String url, boolean ignoreCheck) {
+    if(ignoreCheck || (Util.isSameDomain(url, baseDomain)  && urlSet.add(url))) {
       CountDownLatch latch = new CountDownLatch(2);
       urlQueue.add(latch);
       // new url
-      downloader.add(new HtmlPage(url), latch);
+      downloader.add(new HtmlPage(url, latch));
       return true;
     }
     return false;

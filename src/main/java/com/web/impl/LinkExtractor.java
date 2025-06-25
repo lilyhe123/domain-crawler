@@ -3,7 +3,6 @@ package com.web.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -29,19 +28,22 @@ public class LinkExtractor implements ILinkExtractor  {
   }
   @Override
   public String status() {
-    return executor.toString();
+    StringBuilder sb = new StringBuilder();
+    sb.append("LinkExtractor status: \n");
+    sb.append(executor.toString());
+    return sb.toString();
   }
   @Override
-  public void add(HtmlPage page, CountDownLatch latch) {
+  public void add(HtmlPage page) {
     executor.execute(() -> {
-      extract(page, latch);
+      extract(page);
     });
   }
   @Override
   public void setFrontier(IURLFrontier f) {
     frontier = f;
   }
-  private void extract(HtmlPage page, CountDownLatch latch) {
+  private void extract(HtmlPage page) {
     try {
       String baseUrl = page.getUrl();
       Document doc = page.getDoc();
@@ -60,7 +62,7 @@ public class LinkExtractor implements ILinkExtractor  {
     } catch (Throwable t) {
       t.printStackTrace();
     } finally {
-      latch.countDown();
+      page.countDown();
     }
   }
 }

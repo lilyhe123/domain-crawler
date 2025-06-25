@@ -21,6 +21,8 @@ public class StringListFile {
     path = p;
     writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, 
       StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+    
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> close()));
   }
 
   public List<String> readAll() throws IOException {
@@ -40,9 +42,12 @@ public class StringListFile {
     writer.flush();
   }
   
-  public synchronized void close() {
+  void close() {
     try {
-      writer.close();
+      if(writer != null) {
+        writer.close();
+        System.out.println("FileWrite of StringListFile is closed via shutdown hook.");
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }

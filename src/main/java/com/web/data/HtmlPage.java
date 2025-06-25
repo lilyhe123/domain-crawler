@@ -1,13 +1,17 @@
 package com.web.data;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.jsoup.nodes.Document;
 
-//TODO: prevent direct reference to the Document class
 public class HtmlPage {
+  private final String url;
+  private final CountDownLatch latch;
+  private Document doc;
+
   public String getUrl() {
     return url;
   }
-  private String url;
 
   public Document getDoc() {
     return doc;
@@ -15,12 +19,11 @@ public class HtmlPage {
   public void setDoc(Document d) {
     doc = d;
   }
-  private Document doc;
-
-  public HtmlPage(String u) {
+  public HtmlPage(String u, CountDownLatch l) {
     url = u;
+    latch = l;
   }
-  public void complete() {
-    //TODO: update storage
+  public void countDown() {
+    latch.countDown();
   }
 }
