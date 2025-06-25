@@ -13,6 +13,15 @@ Repeat the process until all pages in the same domain have been crawled.
 
 <img width="765" alt="image" src="https://github.com/user-attachments/assets/2c20b893-d891-4e1f-809c-a69a3adffd82" />
 
+## Deep Dive
+### Thread pool or virtual thread
+Downloading pages from a remove server via http requests is an IO-bound opeation. It's a suitable scenario to use light-weight virtual thread. But we still need limit concurrent execution to prevent overwhelming remote server with too many requests. We use Semaphore for concurrency control.
+
+The crawler offers two options: 1). threadpool with fixed OS threads, 2). vitrual threads with Semaphore for concurrency control.
+
+By default it use thread pool. Add cmd argument '-useVirtualThread' to switch to use vitrual threads.
+
+
 ## How to Run
 ### Prerequisites
 - JDK 23 or later
