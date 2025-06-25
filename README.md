@@ -11,8 +11,7 @@ The crawler should be limited to one domain - so when you start with *https://ww
 Starting from the given URL, the crawler downloads the page and extracts all links in that page. Follow the new local links the crawler can download more pages.
 Repeat the process until all pages in the same domain have been crawled.
 
-<img width="1451" alt="image" src="https://github.com/user-attachments/assets/2f8cec54-9d38-44a8-8674-c8ed07cdc7e5" />
-
+<img width="765" alt="image" src="https://github.com/user-attachments/assets/2c20b893-d891-4e1f-809c-a69a3adffd82" />
 
 ## How to Run
 ### Prerequisites
